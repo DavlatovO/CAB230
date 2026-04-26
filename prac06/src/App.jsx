@@ -2,13 +2,15 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { AllCommunityModule, themeBalham } from 'ag-grid-community';
 import { AgGridProvider, AgGridReact } from 'ag-grid-react';
+import {Container, Button, Badge} from "react-bootstrap";
+import Product from "./Product.jsx";
+import { useNavigate } from 'react-router-dom';
+
+
 
 function App() {
-    const [data, setData] = useState(null);
-
-    useEffect(() => {
-        getDatas
-    }, []);
+    const [rowData, setRowData] = useState(null);
+    const navigate = useNavigate();
 
     const columns = [
         { headerName: "Title", field: "title" },
@@ -18,31 +20,42 @@ function App() {
         { headerName: "Remaining Stock", field: "stock" }
     ]
 
+    useEffect(() => {
+        const fetchProduct = async () => {
+            const response = await fetch(`https://dummyjson.com/products/`);
+            if(!response.ok){
+                throw new Error("Product not found");
+            }
+            const data = await response.json();
+            setRowData(data.products);
+        }
+        fetchProduct();
+    }, [])
+
     return (
+      <Container>
+        <h1>Product Catalogue</h1>
+        <p>
+          <Badge bg="success">{rowData?.length ?? 0}</Badge>products available in the catalogue
+        </p>
         <AgGridProvider modules={[AllCommunityModule]}>
-            <div style={{ height: "300px", width: "600px" }}>
+            <div style={{ height: "300px", width: "1024px" }}>
                 <AgGridReact
                     theme={themeBalham}
-                    columnDefs={table.columns}
-                    rowData={table.rowData}
+                    columnDefs={columns}
+                    rowData={rowData}
+                    pagination
+                    paginationPageSize={20}
+                    onRowClicked={row => navigate(`/product?id=${row.data.id}`)}
                 />
             </div>
         </AgGridProvider>
-    )
+        <Button variant="info" size="sm" className="mt-3" href="https://dummyjson.com/docs/" target="_blank">Go to DummyJSON API</Button>
+      </Container>
+      
+    );
+
 }
 
 export default App
 
-
-// const table = {
-//     columns: [
-//         { headerName: "Make", field: "make", sortable: false },
-//         { headerName: "Model", field: "model" },
-//         { headerName: "Price", field: "price", filter: true },
-//     ],
-//     rowData: [
-//         { make: "Toyota", model: "Camry", price: 28000 },
-//         { make: "Ford", model: "Focus", price: 16700 },
-//         { make: "Hyundai", model: "Kona", price: 23500 },
-//     ]
-// };
