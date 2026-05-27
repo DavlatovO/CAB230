@@ -1,0 +1,98 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "World City API",
+    "description": "This is a simple Express API based on the World Cities Database. It supports basic city and province listings, along with filtering based on Country Code",
+    "version": "1.0.0",
+    "termsOfService": "http://swagger.io/terms",
+    "contact": {
+      "email": "cab230@qut.edu.au"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "https://swagger.io"
+    },
+    "servers": [
+        {
+            "url": "/"
+        }
+    ],
+    "tags": [
+        {
+            "name": "queery",
+            "description": "API queries based on city and optional country code."
+        },
+        {
+            "name": "store",
+            "description": "Access to Petstore orders",
+            "externalDocs": {
+                "description": "Find out more about our store",
+                "url": "https://swagger.io"
+            }
+        },
+        {
+            "name": "user",
+            "description": "Operations about user"
+        }
+    ],
+    
+    "paths": {
+        "/api/city": {
+        "get": {
+            "tags": [
+            "query"
+            ],
+            "summary": "List cities and districts",
+            "description": "Full listing of cities and their districts for the database",
+            "operationId": "listCitiesAndDistricts",
+            "responses": {
+            "200": {
+                "description": "Successful operation",
+                "content": {
+                "application/json": {
+                    "schema": {
+                    "type": "object",
+                    "properties": {
+                        "error": {
+                        "type": "string",
+                        "enum": [
+                            "true",
+                            "false"
+                        ]
+                        },
+                        "message": {
+                        "type": "string",
+                        "enum": [
+                            "Success",
+                            "Error in MySQL query"
+                        ]
+                        },
+                        "cities": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "district": {
+                                "type": "string"
+                            }
+                            }
+                        }
+                        }
+                    }
+                    }
+                }
+                }
+            }
+            }
+        }
+        }
+    }
+}
