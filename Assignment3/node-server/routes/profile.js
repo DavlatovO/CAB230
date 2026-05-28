@@ -50,18 +50,18 @@ router.get('/:email/profile', async(req, res, next) =>{
             }
         }
         if(isOwner){
-            res.status(200).json({
+            return res.status(200).json({
                 email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                dob: user.dob,
-                address: user.address
+                firstName: user.firstName ?? null,
+                lastName: user.lastName ?? null,
+                dob: user.dob ? new Date(user.dob).toISOString().slice(0, 10): null,
+                address: user.address ?? null
             });
         }
        
-        res.status(200).json({ email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName
+        return res.status(200).json({ email: user.email,
+            firstName: user.firstName ?? null,
+            lastName: user.lastName ?? null
         });
         
     } catch(err){
@@ -90,7 +90,7 @@ router.put("/:email/profile", authenticateToken, async (req, res, next) => {
         if(!firstName || !lastName || !dob || !address){
             return res.status(400).json({ 
                 error: true,
-                message: "Request body incomplete: firstName, lastName, dob and address are required"
+                message: "Request body incomplete: firstName, lastName, dob and address are required."
             });
         }
 
@@ -116,7 +116,7 @@ router.put("/:email/profile", authenticateToken, async (req, res, next) => {
         if (isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== dob) {
             return res.status(400).json({
                 error: true,
-                message: "Invalid imput: dob must be a real date in format YYYY-MM-DD."
+                message: "Invalid input: dob must be a real date in format YYYY-MM-DD."
             });
         }
 
@@ -124,7 +124,7 @@ router.put("/:email/profile", authenticateToken, async (req, res, next) => {
         if(parsedDate >= new Date()) {
             return res.status(400).json({
                 error: true,
-                message: "Invalid input: dob must be in the past."
+                message: "Invalid input: dob must be a date in the past."
             });
         }
 
@@ -137,7 +137,7 @@ router.put("/:email/profile", authenticateToken, async (req, res, next) => {
             email: profileEmail,
             firstName: firstName,
             lastName: lastName,
-            dob: dob,
+            dob: new Date(dob).toISOString().slice(0, 10),
             address: address
         });
 

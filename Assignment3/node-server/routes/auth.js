@@ -34,7 +34,7 @@ router.post('/register', async (req, res, next) => {
             email: email,
             password: hashedPassword,
         })
-        res.status(200).json({error: false, message: "User created"});
+        res.status(201).json({error: false, message: "User created"});
     }catch(err){
         next(err);
     }

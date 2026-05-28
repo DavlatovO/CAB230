@@ -44,7 +44,7 @@ router.post('/rentals/:id', authenticateToken, async(req, res, next) =>{
         // check rental exists
         const rental = await req.db('data').where('id', rentalId).first();
         if (!rental) {
-            return res.status(404).json({ error: true, message: 'No rental with this ID.' });
+            return res.status(404).json({ error: true, message: "No rental exists with this ID." });
         }
 
         
@@ -62,8 +62,9 @@ router.post('/rentals/:id', authenticateToken, async(req, res, next) =>{
         } else {
             await req.db('ratings').insert({ rentalId, userEmail, ...data});
         }
-
-        res.status(201).json({ rating, dateTime: new Date().toISOString() });
+        const response = {rating, dateTime: new Date().toISOString() };
+        if (comment) response.comment = comment;
+        res.status(201).json(response);
     } catch(err){
         next(err);
     }
@@ -89,10 +90,10 @@ router.get('/rentals/:id', authenticateToken, async (req, res, next) =>{
         .where({ rentalId, userEmail }).first();
         
         if(!row){
-            return res.status(404).json({ error: true, message: "No rating with this rental ID"});
+            return res.status(404).json({ error: true, message: "No rating exists with this rental ID."});
         }
         
-        res.status(200).json({rating: rows.rating, dateTime: row.dateTime });
+        res.status(200).json({rating: row.rating, dateTime: row.dateTime });
     
     }catch(err){
         next(err);
@@ -105,13 +106,13 @@ router.get('/', authenticateToken, async(req, res, next) => {
         if (req.query.page !== undefined && (isNaN(parseInt(req.query.page)) || parseInt(req.query.page) < 1)) {
             return res.status(400).json({
                 error: true,
-                message: "Invalid page parameter. Must be an integer greater than or eqaul to 1."
+                message: "Invalid page parameter. Must be an integer greater than or equal to 1."
             });
         }
 
         const email = req.user.email;
         const page = parseInt(req.query.page) || 1;
-        const perPage = 20;
+        const perPage = 10;
         const offset = (page - 1) * perPage;
 
         const { total } = await req.db('ratings')
