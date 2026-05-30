@@ -12,7 +12,8 @@ import userRouter from './routes/auth.js';
 import rentalsRouter from './routes/rentals.js';
 import profileRouter from './routes/profile.js';
 import rateLimit from 'express-rate-limit';
-
+import https from 'node:https';
+import fs from 'node:fs';
 
 const app = express();
 const port = 3000;
@@ -53,8 +54,12 @@ app.get('/', (req, res, next) => {
     res.send("<h1>Hello</h1>");
 });
 
+const credentials = {
+  key: fs.readFileSync('./certs/selfsigned.key'),
+  cert: fs.readFileSync('./certs/selfsigned.crt')
+};
 
 
-app.listen(port, ()=>{
-    console.log(`Server listening on http://localhost:${port}`);
+https.createServer(credentials, app).listen(port, () => {
+  console.log(`Server listening on https://localhost:${port}`);
 });
