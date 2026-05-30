@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import argon2 from 'argon2';
 const router = express.Router();
 
 // shared helper
@@ -29,7 +29,7 @@ router.post('/register', async (req, res, next) => {
         if(existing) {
             return res.status(409).json({error: true, message: "User already exists" });
         }
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await argon2.hash(password, 10);
         const user = await req.db('users').insert({
             email: email,
             password: hashedPassword,
@@ -62,7 +62,7 @@ router.post('/login', async (req, res, next) => {
             });
         }
 
-        const match = await bcrypt.compare(password, user.password);
+        const match = await argon2.verify(user.password, password);
         if (!match) {
             return res.status(401).json({ 
                 error: true, 
@@ -99,7 +99,7 @@ router.post('/debugLogin', async (req, res, next) => {
             });
         }
 
-        const match = await bcrypt.compare(password, user.password);
+        const match = await argon2.verify(user.password, password);
         if (!match) {
             return res.status(401).json({ 
                 error: true, 
